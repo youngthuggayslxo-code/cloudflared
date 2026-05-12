@@ -1,0 +1,59 @@
+package client
+
+import (
+    "fmt"
+    "net"
+    "time"
+
+    "github.com/cloudflare/quic-go"
+    "github.com/prometheus/client_golang/prometheus"
+)
+
+//////////////////////////////////////////////////////
+// Metrics Definitions
+//////////////////////////////////////////////////////
+
+var (
+    quicConnections = prometheus.NewCounter(
+        prometheus.CounterOpts{
+            Name: "quic_connections_total",
+            Help: "Total number of QUIC connections established",
+        },
+    )
+
+    quicErrors = prometheus.NewCounter(
+        prometheus.CounterOpts{
+            Name: "quic_errors_total",
+            Help: "Total number of QUIC connection errors",
+        },
+    )
+
+    quicLatency = prometheus.NewHistogram(
+        prometheus.HistogramOpts{
+            Name:    "quic_connection_latency_seconds",
+            Help:    "Latency of QUIC connections",
+            Buckets: prometheus.DefBuckets,
+        },
+    )
+)
+
+func init() {
+    prometheus.MustRegister(quicConnections, quicErrors, quicLatency)
+}
+
+//////////////////////////////////////////////////////
+// QUIC Connection with Metrics
+//////////////////////////////////////////////////////
+
+func DialQUICWithMetrics(addr string) error {
+    start := time.Now()
+
+    session, err := quic.DialAddr(addr, nil, nil)
+    if err != nil {
+        quicErrors.Inc()
+        return fmt.Errorf("failed to dial QUIC: %w", err)
+    }
+    defer session.CloseWithError(0, "closing")
+
+    quicConnections.Inc()
+    quicLatency.Observe(time.Since
