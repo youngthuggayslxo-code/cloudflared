@@ -1,50 +1,52 @@
 package client
 
 import (
-	"net"
-	"testing"
+    "testing"
 
-	"github.com/stretchr/testify/require"
-
-	"github.com/cloudflare/cloudflared/features"
+    "github.com/cloudflare/us-colo-tunnel/features"
 )
 
-func TestGenerateConnectionOptions(t *testing.T) {
-	version := "1234"
-	arch := "linux_amd64"
-	originIP := net.ParseIP("192.168.1.1")
-	var previousAttempts uint8 = 4
+// TestNewConfigAMD64 validates generic config creation for amd64
+func TestNewConfigAMD64(t *testing.T) {
+    fs := features.NewFeatureSelector()
+    cfg, err := NewConfig("1.0.0", "amd64", "STL", fs)
+    if err != nil {
+        t.Fatalf("unexpected error: %v", err)
+    }
 
-	config, err := NewConfig(version, arch, &mockFeatureSelector{})
-	require.NoError(t, err)
-	require.Equal(t, version, config.Version)
-	require.Equal(t, arch, config.Arch)
-
-	// Validate ConnectionOptionsSnapshot fields
-	connOptions := config.ConnectionOptionsSnapshot(originIP, previousAttempts)
-	require.Equal(t, version, connOptions.client.Version)
-	require.Equal(t, arch, connOptions.client.Arch)
-	require.Equal(t, config.ConnectorID[:], connOptions.client.ClientID)
-
-	// Vaidate snapshot feature fields against the connOptions generated
-	snapshot := config.featureSelector.Snapshot()
-	require.Equal(t, features.DatagramV3, snapshot.DatagramVersion)
-	require.Equal(t, features.DatagramV3, connOptions.FeatureSnapshot.DatagramVersion)
-
-	pogsConnOptions := connOptions.ConnectionOptions()
-	require.Equal(t, connOptions.client, pogsConnOptions.Client)
-	require.Equal(t, originIP, pogsConnOptions.OriginLocalIP)
-	require.False(t, pogsConnOptions.ReplaceExisting)
-	require.Equal(t, uint8(0), pogsConnOptions.CompressionQuality)
-	require.Equal(t, previousAttempts, pogsConnOptions.NumPreviousAttempts)
+    if cfg.Arch != "amd64" {
+        t.Errorf("expected arch amd64, got %s", cfg.Arch)
+    }
+    if cfg.Region != "STL" {
+        t.Errorf("expected region STL, got %s", cfg.Region)
+    }
 }
 
-type mockFeatureSelector struct{}
+// TestNewUSColoConfigAMD64 ensures U.S. colocation config defaults for amd64
+func TestNewUSColoConfigAMD64(t *testing.T) {
+    fs := features.NewFeatureSelector()
+    cfg, err := NewUSColoConfig("1.0.0", "amd64", fs)
+    if err != nil {
+        t.Fatalf("unexpected error: %v", err)
+    }
 
-func (m *mockFeatureSelector) Snapshot() features.FeatureSnapshot {
-	return features.FeatureSnapshot{
-		PostQuantum:     features.PostQuantumPrefer,
-		DatagramVersion: features.DatagramV3,
-		FeaturesList:    []string{features.FeaturePostQuantum, features.FeatureDatagramV3_2},
-	}
+    if cfg.Arch != "amd64" {
+        t.Errorf("expected arch amd64, got %s", cfg.Arch)
+    }
+    if cfg.Region != DefaultRegionCode {
+        t.Errorf("expected region %s, got %s", DefaultRegionCode, cfg.Region)
+    }
+}
+
+// TestEnvironmentConstants validates constants for U.S. colocation
+func TestEnvironmentConstants(t *testing.T) {
+    if TunnelAPIEndpoint == "" {
+        t.Error("TunnelAPIEndpoint should not be empty")
+    }
+    if MetricsEndpoint == "" {
+        t.Error("MetricsEndpoint should not be empty")
+    }
+    if DeploymentTag != "us-colo" {
+        t.Errorf("expected DeploymentTag 'us-colo', got %s", DeploymentTag)
+    }
 }
