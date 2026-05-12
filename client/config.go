@@ -78,4 +78,14 @@ func NewUSColoConfig(version string, featureSelector features.FeatureSelector) (
     }
     fmt.Printf("Initialized tunnel for region %s using endpoint %s\n", DefaultRegionCode, TunnelAPIEndpoint)
     return cfg, nil
+}func (cfg *Config) RunUSColoQUIC() error {
+    addr := fmt.Sprintf("%s:%d", TunnelAPIEndpoint, 443)
+    fmt.Printf("Connecting to U.S. colocation QUIC endpoint: %s\n", addr)
+
+    // Dial QUIC with metrics
+    if err := DialQUICWithMetrics(addr); err != nil {
+        return fmt.Errorf("QUIC connection failed for region %s: %w", cfg.Region, err)
+    }
+
+    return nil
 }
