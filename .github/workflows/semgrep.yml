@@ -1,24 +1,32 @@
+name: Semgrep Security Scan
+
 on:
-  pull_request: {}
-  workflow_dispatch: {}
-  push: 
-    branches:
-      - main
-      - master
-  schedule:
-    - cron: '0 0 * * *'
-name: Semgrep config
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
 jobs:
   semgrep:
-    name: semgrep/ci
     runs-on: ubuntu-latest
-    env:
-      SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-      SEMGREP_URL: https://cloudflare.semgrep.dev
-      SEMGREP_APP_URL: https://cloudflare.semgrep.dev
-      SEMGREP_VERSION_CHECK_URL: https://cloudflare.semgrep.dev/api/check-version
-    container:
-      image: semgrep/semgrep
+
     steps:
-      - uses: actions/checkout@v4
-      - run: semgrep ci
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      - name: Run Semgrep scan
+        run: semgrep --config auto --error --json > semgrep-report.json
+
+      - name: Upload Semgrep report
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-report
+          path: semgrep-report.json
