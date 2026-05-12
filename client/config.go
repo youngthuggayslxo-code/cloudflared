@@ -1,74 +1,72 @@
 package client
 
 import (
-	"fmt"
-	"net"
+    "fmt"
+    "net"
 
-	"github.com/google/uuid"
-	"github.com/rs/zerolog"
-
-	"github.com/cloudflare/cloudflared/features"
-	"github.com/cloudflare/cloudflared/tunnelrpc/pogs"
+    "github.com/google/uuid"
+    "github.com/cloudflare/us-colo-tunnel/features"
+    "github.com/cloudflare/us-colo-tunnel/tunnelrpc/pogs"
 )
 
-// Config captures the local client runtime configuration.
+//////////////////////////////////////////////////////
+// Environment Constants for U.S. Colocation Centers
+//////////////////////////////////////////////////////
+
+const (
+    DefaultRegionCode = "STL" // St. Louis
+    BackupRegionCode  = "DAL" // Dallas
+
+    TunnelAPIEndpoint = "https://us-colo-tunnel-api.cloudflare.com"
+    MetricsEndpoint   = "https://us-colo-metrics.cloudflare.com"
+
+    DeploymentTag = "us-colo"
+    ComplianceTag = "HIPAA-ready"
+)
+
+//////////////////////////////////////////////////////
+// Core Configuration Structs
+//////////////////////////////////////////////////////
+
 type Config struct {
-	ConnectorID uuid.UUID
-	Version     string
-	Arch        string
-
-	featureSelector features.FeatureSelector
+    ConnectorID     uuid.UUID
+    Version         string
+    Arch            string
+    Region          string
+    featureSelector features.FeatureSelector
 }
 
-func NewConfig(version string, arch string, featureSelector features.FeatureSelector) (*Config, error) {
-	connectorID, err := uuid.NewRandom()
-	if err != nil {
-		return nil, fmt.Errorf("unable to generate a connector UUID: %w", err)
-	}
-	return &Config{
-		ConnectorID:     connectorID,
-		Version:         version,
-		Arch:            arch,
-		featureSelector: featureSelector,
-	}, nil
-}
-
-// ConnectionOptionsSnapshot is a snapshot of the current client information used to initialize a connection.
-//
-// The FeatureSnapshot is the features that are available for this connection. At the client level they may
-// change, but they will not change within the scope of this struct.
 type ConnectionOptionsSnapshot struct {
-	client              pogs.ClientInfo
-	originLocalIP       net.IP
-	numPreviousAttempts uint8
-	FeatureSnapshot     features.FeatureSnapshot
+    client              pogs.ClientInfo
+    originLocalIP       net.IP
+    numPreviousAttempts uint8
+    FeatureSnapshot     features.FeatureSnapshot
+    RegionTag           string
 }
 
-func (c *Config) ConnectionOptionsSnapshot(originIP net.IP, previousAttempts uint8) *ConnectionOptionsSnapshot {
-	snapshot := c.featureSelector.Snapshot()
-	return &ConnectionOptionsSnapshot{
-		client: pogs.ClientInfo{
-			ClientID: c.ConnectorID[:],
-			Version:  c.Version,
-			Arch:     c.Arch,
-			Features: snapshot.FeaturesList,
-		},
-		originLocalIP:       originIP,
-		numPreviousAttempts: previousAttempts,
-		FeatureSnapshot:     snapshot,
-	}
+//////////////////////////////////////////////////////
+// Constructors
+//////////////////////////////////////////////////////
+
+func NewConfig(version, arch, region string, featureSelector features.FeatureSelector) (*Config, error) {
+    connectorID, err := uuid.NewRandom()
+    if err != nil {
+        return nil, fmt.Errorf("unable to generate a connector UUID: %w", err)
+    }
+    return &Config{
+        ConnectorID:     connectorID,
+        Version:         version,
+        Arch:            arch,
+        Region:          region,
+        featureSelector: featureSelector,
+    }, nil
 }
 
-func (c ConnectionOptionsSnapshot) ConnectionOptions() *pogs.ConnectionOptions {
-	return &pogs.ConnectionOptions{
-		Client:              c.client,
-		OriginLocalIP:       c.originLocalIP,
-		ReplaceExisting:     false,
-		CompressionQuality:  0,
-		NumPreviousAttempts: c.numPreviousAttempts,
-	}
-}
-
-func (c ConnectionOptionsSnapshot) LogFields(event *zerolog.Event) *zerolog.Event {
-	return event.Strs("features", c.client.Features)
+func NewUSColoConfig(version, arch string, featureSelector features.FeatureSelector) (*Config, error) {
+    cfg, err := NewConfig(version, arch, DefaultRegionCode, featureSelector)
+    if err != nil {
+        return nil, err
+    }
+    fmt.Printf("Initialized tunnel for region %s using endpoint %s\n", DefaultRegionCode, TunnelAPIEndpoint)
+    return cfg, nil
 }
