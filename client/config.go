@@ -14,12 +14,15 @@ import (
 //////////////////////////////////////////////////////
 
 const (
+    // Data center codes
     DefaultRegionCode = "STL" // St. Louis
     BackupRegionCode  = "DAL" // Dallas
 
+    // API endpoints
     TunnelAPIEndpoint = "https://us-colo-tunnel-api.cloudflare.com"
     MetricsEndpoint   = "https://us-colo-metrics.cloudflare.com"
 
+    // Monitoring tags
     DeploymentTag = "us-colo"
     ComplianceTag = "HIPAA-ready"
 )
@@ -28,6 +31,7 @@ const (
 // Core Configuration Structs
 //////////////////////////////////////////////////////
 
+// Config captures the local client runtime configuration.
 type Config struct {
     ConnectorID     uuid.UUID
     Version         string
@@ -36,6 +40,8 @@ type Config struct {
     featureSelector features.FeatureSelector
 }
 
+// ConnectionOptionsSnapshot represents a snapshot of client state
+// for initializing a connection.
 type ConnectionOptionsSnapshot struct {
     client              pogs.ClientInfo
     originLocalIP       net.IP
@@ -48,6 +54,7 @@ type ConnectionOptionsSnapshot struct {
 // Constructors
 //////////////////////////////////////////////////////
 
+// NewConfig initializes a generic configuration.
 func NewConfig(version, arch, region string, featureSelector features.FeatureSelector) (*Config, error) {
     connectorID, err := uuid.NewRandom()
     if err != nil {
@@ -62,8 +69,10 @@ func NewConfig(version, arch, region string, featureSelector features.FeatureSel
     }, nil
 }
 
-func NewUSColoConfig(version, arch string, featureSelector features.FeatureSelector) (*Config, error) {
-    cfg, err := NewConfig(version, arch, DefaultRegionCode, featureSelector)
+// NewUSColoConfig initializes a U.S. colocation–specific configuration.
+// Defaults to amd64 architecture and STL region.
+func NewUSColoConfig(version string, featureSelector features.FeatureSelector) (*Config, error) {
+    cfg, err := NewConfig(version, "amd64", DefaultRegionCode, featureSelector)
     if err != nil {
         return nil, err
     }
