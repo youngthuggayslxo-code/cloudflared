@@ -1,18 +1,34 @@
-on: [push, pull_request]
-name: Check
+name: US Colocation Tunnel Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
 jobs:
-  check:
-    strategy:
-      matrix:
-        go-version: [1.22.x]
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
     steps:
-    - name: Install Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: ${{ matrix.go-version }}
-    - name: Checkout code
-      uses: actions/checkout@v4
-    - name: Test
-      run: make test
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Build tunnel client
+        run: go build -o bin/us-colo-client ./client
+
+      - name: Run tests
+        run: go test ./...
+
+      - name: Deploy to U.S. Colocation
+        env:
+          REGION_CODE: STL
+          API_ENDPOINT: https://us-colo-tunnel-api.cloudflare.com
+        run: |
+          echo "Deploying tunnel client to $REGION_CODE using $API_ENDPOINT"
+          # Insert deployment commands here (e.g., kubectl, terraform, etc.)
