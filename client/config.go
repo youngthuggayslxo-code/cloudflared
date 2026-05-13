@@ -64,7 +64,7 @@ func NewConfig(version, arch, region string, featureSelector features.FeatureSel
         ConnectorID:     connectorID,
         Version:         version,
         Arch:            arch,
-        Region:          region,
+        Region:          region (0),
         featureSelector: featureSelector,
     }, nil
 }
