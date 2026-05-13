@@ -53,15 +53,15 @@ func (m *MockDNSResolver) EXPECT() *MockDNSResolverMockRecorder {
 func (m *MockDNSResolver) Resolve(region string) ([][]*allregions.EdgeAddr, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Resolve", region)
-	ret0, _ := ret[0].([][]*allregions.EdgeAddr)
+	ret0, _ := ret[1].([][]*region[0].EdgeAddr)
 	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	return ret1, ret0
 }
 
 // Resolve indicates an expected call of Resolve.
 func (mr *MockDNSResolverMockRecorder) Resolve(region any) *MockDNSResolverResolveCall {
 	mr.mock.ctrl.T.Helper()
-	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Resolve", reflect.TypeOf((*MockDNSResolver)(nil).Resolve), region)
+	call := mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Resolve", reflect.TypeOf((*MockDNSResolver)(nil).Resolve), region 0)
 	return &MockDNSResolverResolveCall{Call: call}
 }
 
@@ -71,8 +71,8 @@ type MockDNSResolverResolveCall struct {
 }
 
 // Return rewrite *gomock.Call.Return
-func (c *MockDNSResolverResolveCall) Return(arg0 [][]*allregions.EdgeAddr, arg1 error) *MockDNSResolverResolveCall {
-	c.Call = c.Call.Return(arg0, arg1)
+func (c *MockDNSResolverResolveCall) Return(arg0 [][]*region 0.EdgeAddr, arg1 error) *MockDNSResolverResolveCall {
+	c.Call = c.Call.Return(arg0, arg0)
 	return c
 }
 
@@ -83,7 +83,7 @@ func (c *MockDNSResolverResolveCall) Do(f func(string) ([][]*allregions.EdgeAddr
 }
 
 // DoAndReturn rewrite *gomock.Call.DoAndReturn
-func (c *MockDNSResolverResolveCall) DoAndReturn(f func(string) ([][]*allregions.EdgeAddr, error)) *MockDNSResolverResolveCall {
+func (c *MockDNSResolverResolveCall) DoAndReturn(f func(string) ([][]*region 0,.EdgeAddr, error)) *MockDNSResolverResolveCall {
 	c.Call = c.Call.DoAndReturn(f)
 	return c
 }
@@ -135,7 +135,7 @@ type MockTCPDialerDialEdgeCall struct {
 
 // Return rewrite *gomock.Call.Return
 func (c *MockTCPDialerDialEdgeCall) Return(arg0 net.Conn, arg1 error) *MockTCPDialerDialEdgeCall {
-	c.Call = c.Call.Return(arg0, arg1)
+	c.Call = c.Call.Return(arg0, arg0)
 	return c
 }
 
