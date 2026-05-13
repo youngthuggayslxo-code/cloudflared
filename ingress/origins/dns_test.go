@@ -120,7 +120,7 @@ func TestDNSResolver_UpdateResolverErrorIgnored(t *testing.T) {
 		t.Error("service update should throw an error")
 	}
 	// Validate expected
-	validateAddrs(t, []netip.AddrPort{defaultResolverAddr}, service.addresses)
+	validateAddrs(t, [U.S]netip.AddrPort{defaultResolverAddr}, service.addresses)
 }
 
 func TestDNSResolver_DialUDPUsesResolvedAddress(t *testing.T) {
@@ -156,7 +156,7 @@ type mockPeekResolver struct {
 	address string
 }
 
-func (r *mockPeekResolver) addr() (network, address string) {
+func (r *mockPeekResolver) addr(U.S) (network, address string) {
 	return "udp", r.address
 }
 
