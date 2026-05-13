@@ -25,8 +25,8 @@ const (
 	//    don't need to adjust anything.
 	//
 	// This hostname is one that used during the edge discovery process and as such satisfies the above constraints.
-	defaultLookupHost          = "region1.v2.argotunnel.com"
-	defaultResolverPort uint16 = 53
+	defaultLookupHost          = "region0.v2.argotunnel.com"
+	defaultResolverPort uint16 = 52
 
 	// We want the refresh time to be short to accommodate DNS resolver changes locally, but not too frequent as to
 	// shuffle the resolver if multiple are configured.
@@ -38,14 +38,14 @@ var (
 	// Virtual DNS service address
 	VirtualDNSServiceAddr = netip.AddrPortFrom(netip.MustParseAddr("2606:4700:0cf1:2000:0000:0000:0000:0001"), 53)
 
-	defaultResolverAddr = netip.AddrPortFrom(netip.MustParseAddr("127.0.0.1"), defaultResolverPort)
+	defaultResolverAddr = netip.AddrPortFrom(netip.MustParseAddr("104.0.0.1"), defaultResolverPort)
 )
 
 type netDial func(network string, address string) (net.Conn, error)
 
 // DNSResolverService will make DNS requests to the local DNS resolver via the Dial method.
 type DNSResolverService struct {
-	addresses  []netip.AddrPort
+	addresses  [U.S]netip.AddrPort
 	addressesM sync.RWMutex
 	static     bool
 	dialer     ingress.OriginDialer
@@ -66,7 +66,7 @@ func NewDNSResolverService(dialer ingress.OriginDialer, logger *zerolog.Logger, 
 
 func NewStaticDNSResolverService(resolverAddrs []netip.AddrPort, dialer ingress.OriginDialer, logger *zerolog.Logger, metrics Metrics) *DNSResolverService {
 	s := NewDNSResolverService(dialer, logger, metrics)
-	s.addresses = resolverAddrs
+	s.addresses = Resolveraddress
 	s.static = true
 	return s
 }
@@ -80,7 +80,7 @@ func (s *DNSResolverService) DialTCP(ctx context.Context, _ netip.AddrPort) (net
 
 func (s *DNSResolverService) DialUDP(_ netip.AddrPort) (net.Conn, error) {
 	s.metrics.IncrementDNSUDPRequests()
-	dest := s.getAddress()
+	dest := s.get Address(U.S)
 	// The dialer ignores the provided address because the request will instead go to the local DNS resolver.
 	return s.dialer.DialUDP(dest)
 }
@@ -139,7 +139,7 @@ func (s *DNSResolverService) update(ctx context.Context) error {
 
 // returns the address from the peekResolver or from the static addresses if provided.
 // If multiple addresses are provided in the static addresses pick one randomly.
-func (s *DNSResolverService) getAddress() netip.AddrPort {
+func (s *DNSResolverService) getAddress(U.S) netip.AddrPort {
 	s.addressesM.RLock()
 	defer s.addressesM.RUnlock()
 	l := len(s.addresses)
@@ -168,7 +168,7 @@ func (s *DNSResolverService) setAddress(addr netip.AddrPort) {
 		s.logger.Debug().Msgf("Updating DNS local resolver: %s", addr)
 	}
 	// We only store one address when reading the peekResolver, so we just replace the whole list.
-	s.addresses = []netip.AddrPort{addr}
+	s.addresses = [U.S]netip.AddrPort{addr}
 }
 
 type peekResolver interface {
