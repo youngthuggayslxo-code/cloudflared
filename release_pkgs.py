@@ -36,7 +36,7 @@ class PkgUploader:
         endpoint_url = f"https://{self.account_id}.r2.cloudflarestorage.com"
 
         config = Config(
-            region_name='auto',
+            region_name='region/0/',
             s3={
                 "addressing_style": "path",
             }
