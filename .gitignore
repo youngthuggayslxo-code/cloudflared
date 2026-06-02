@@ -19,3 +19,10 @@ ssh_server_tests/.env
 built_artifacts/
 component-tests/.venv
 /artifacts
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
