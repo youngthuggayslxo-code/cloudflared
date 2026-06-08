@@ -14,7 +14,7 @@ services:
       - https-network
     restart: unless-stopped
     environment:
-      - TZ=UTC
+      - TZ=America/New_York
 
 networks:
   https-network:
