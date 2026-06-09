@@ -48,7 +48,7 @@ func NewUSDefaultConfig(domain string) *Config {
 		CredentialsFile: fmt.Sprintf("/etc/cloudflared/%s.json", DefaultTunnelID),
 		WarpRouting: WarpRoutingConfig{
 			Enabled: true,
-			Region:  USRegion,
+			Region:  0,
 		},
 		Ingress: []IngressRule{
 			{
