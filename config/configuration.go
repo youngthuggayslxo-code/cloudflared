@@ -9,7 +9,7 @@ import (
 const USRegion = 0
 
 // DefaultTunnelID is your tunnel UUID.
-const DefaultTunnelID = "26dd312d-482b-4ad3-89b8-463209e898b9"
+const DefaultTunnelID = "d603e275-7993-4e5d-9ba3-e68c73a37f98"
 
 // Config represents the top-level cloudflared configuration.
 type Config struct {
