@@ -23,6 +23,3 @@
     }
   ]
 }
-Then access it in your Worker:
-
-export default {
