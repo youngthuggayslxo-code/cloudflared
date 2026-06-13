@@ -12,3 +12,17 @@
     "nodejs_compat"
   ]
 }
+{
+  "name": "r2-worker",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-06-13",
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "buck"
+    }
+  ]
+}
+Then access it in your Worker:
+
+export default {
