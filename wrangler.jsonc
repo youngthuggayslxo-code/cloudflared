@@ -23,3 +23,46 @@
     }
   ]
 }
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "patient-lake-605e",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-06-20",
+  "observability": {
+    "enabled": true
+  },
+
+  // Add this to your wrangler.jsonc
+  "vpc_services": [
+    {
+      "binding": "VPC_SERVICE",
+      "service_id": "019e864e-a71d-7ae0-987f-2979490430f1",
+      "remote": true
+    }
+  ]
+}
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "patient-lake-605e",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-02-04",
+  "observability": {
+    "enabled": true
+  },
+
+  // Add nodejs_compat compatibility flag to support common database drivers
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+
+  // Add this to your wrangler.jsonc
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "58ab62c3fb2f47a6bc460536ee4f5645",
+      
+      // Optional. Can be used to connect to a local database for local development with `wrangler dev`
+      "localConnectionString": "<LOCAL_CONNECTION_STRING_FOR_LOCAL_DEVELOPMENT_HERE>"
+    }
+  ]
+}
